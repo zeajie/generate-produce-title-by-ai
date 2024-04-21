@@ -1,0 +1,13 @@
+{
+  "builds":[
+    "src":"/main.py",
+    "use":"@vercel/pyhon"
+    
+  ],
+  "routes":[
+    {
+      "src":"/index",
+      "dest":"main.py"
+    }
+  ]
+}
