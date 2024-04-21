@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload and Download Excel File</title>
+</head>
+<body>
+<div style="text-align: center;">
+    <h1>标题写得好，出单少不了</h1>
+    <h2>Upload Excel File for Processing</h2>
+    <form id="uploadForm">
+        <input type="file" id="fileInput" name="file" accept=".xls, .xlsx">
+        <button type="button" id="uploadButton" onclick="uploadAndDownloadFile()">Upload and Process File</button>
+    </form>
+</div>
+
+
+    <script>
+        function uploadAndDownloadFile() {
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files.length) {
+                alert("Please select a file before uploading.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            // Disable the button to prevent multiple submissions
+            const uploadButton = document.getElementById('uploadButton');
+            uploadButton.disabled = true;
+            uploadButton.innerText = 'Processing...';
+
+            fetch('http://localhost:5000/upload-excel', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok.');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const timestamp = new Date().toISOString().replace(/[\W_]+/g, "");
+                // a.download = 'processed.xlsx';
+                a.download = `output_${timestamp}.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                uploadButton.disabled = false;
+                uploadButton.innerText = 'Upload and Process File';
+            })
+            .catch(error => {
+                console.error('There was a problem with the file upload:', error);
+                alert('Error uploading file: ' + error.message);
+                uploadButton.disabled = false;
+                uploadButton.innerText = 'Upload and Process File';
+            });
+        }
+    </script>
+</body>
+</html>
