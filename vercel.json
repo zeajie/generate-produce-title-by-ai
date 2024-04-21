@@ -1,4 +1,5 @@
 {
+  "vershion":2,
   "builds":[
     {
       "src":"app.py",
